@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const https = require('https');
+const path = require('path');
 const app = express();
 const config = require('./js/config/default');
 const port = process.env.PORT || config.port;
@@ -9,11 +10,21 @@ const router = express.Router();
 const server = http.createServer(app)
 
 // Routes
-const index = require('./js/routes/index') 
+const index = require('./js/routes/index');
+const sharing = require('./js/routes/sharing');
+
+// Set EJS
+app.set('views', path.join(__dirname, '/public/views'));
+app.set('view engine', 'ejs');
+
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded());
+app.use(express.static('public'));
 
 // apply the routes to our application
 //app.use('/', router)
-app.use('/', index)
+app.use('/', index);
+app.use('/sharing', sharing);
 
 // router.use('/', function(req, res, next) {
 //     console.log(req.method, req.url)

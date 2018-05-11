@@ -1,7 +1,7 @@
 {
-  "name": "app-server",
+  "name": "signal-server",
   "version": "1.0.0",
-  "description": "c",
+  "description": "git config --global user.email \"you@example.com\"\r git config --global user.name \"Your Name",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ejs": "^2.6.1",
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "socket.io": "^2.1.0"
   }
 }
