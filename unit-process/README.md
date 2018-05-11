@@ -1,2 +1,1 @@
-git config --global user.email "you@example.com"
-git config --global user.name "Your Name
+브런치 테스트
