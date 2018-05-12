@@ -9,6 +9,8 @@ const router = express.Router();
 
 const server = http.createServer(app)
 
+const socket = require('socket.io')
+
 // Routes
 const index = require('./js/routes/index');
 const sharing = require('./js/routes/sharing');
@@ -32,7 +34,15 @@ app.use('/sharing', sharing);
 //     next()
 // });
 
+let io = socket.listen(server);
 
+io.sockets.on('connection', function(socket) {
+    console.log(`${socket.id} is connected`)
+    
+    socket.on('parkoon', function(data) {
+        console.log(data)
+    }) 
+});
 
 
 // router.param('name', function(req, res, next, name) {

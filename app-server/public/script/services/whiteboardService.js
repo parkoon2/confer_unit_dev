@@ -1,13 +1,23 @@
 const WhiteBoard = (function() {
    
     let drawboard, drawContext, laserboard, laserContext;
-    let isDrawing = false;
-    let isLaserpointing = false;
     let x, y, status, tooltype;
     let drawData;
 
     let lineSize = 7;
     let eraserSize = 7;
+
+    let laser = {
+        pos: [],
+        width: 24,
+        height: 24,
+        pointer: null,
+        enable: false      
+    }
+
+    let draw = {
+        enable: false
+    }
 
     let init = function(data, callback) {
         console.log('## whiteboard service [init]', data);
@@ -26,9 +36,10 @@ const WhiteBoard = (function() {
     
     let drawStartHandler = function(event) {
         
-        if (!isLaserpointing) isDrawing = true;
+        // If you are using laser pointer, you are not able to use drawing
+        if (!laser.enable) draw.enable = true;
         
-        if (isDrawing) {
+        if (draw.enable) {
             let bounds = event.target.getBoundingClientRect();
             x = event.pageX - bounds.left - scrollX;
             y = event.pageY - bounds.top - scrollY;
@@ -42,14 +53,10 @@ const WhiteBoard = (function() {
                 })
             }            
         }
-
-       
-            
-
     }
 
     let drawEndHandler = function(event) {
-        isDrawing = false;
+        draw.enable = false;
         console.log('ss')
         drawContext.closePath();
     }
@@ -58,7 +65,7 @@ const WhiteBoard = (function() {
         let bounds = event.target.getBoundingClientRect();
         x = event.pageX - bounds.left - scrollX;
         y = event.pageY - bounds.top - scrollY;
-        if (isDrawing) {
+        if (draw.enable) {
         
         
             status = 'move'
@@ -78,7 +85,7 @@ const WhiteBoard = (function() {
         console.log('## whiteboard controller [ penHandler ]')
         // 임시..
         // 나중에 레이저 포인터 아이콘에서 포커스 사라졌을 때 처리할 것!
-        isLaserpointing = false;
+        laser.enable = false;
 
 
         tooltype = 'pen';
@@ -96,55 +103,48 @@ const WhiteBoard = (function() {
 
     }
 
-    let tempX = [];
-    let tempY = []; 
+
 
     let  laserMoveHandler = function(event) {
         let bounds = event.target.getBoundingClientRect();
         x = event.pageX - bounds.left - scrollX;
         y = event.pageY - bounds.top - scrollY;
 
-        if (isLaserpointing) {
-            var imgTag = new Image();
-            imgTag.src = '../image/point.png'; 
-            imgTag.onload = function() {
+        
+        if (laser.enable) {
+            pointer = new Image();
+            pointer.src = '../image/point.png'; 
+            pointer.onload = function() {
                 drawboard.style.cursor = 'none';
-                //laserboard.style.cursor = 'none';
-                //clearRect(xcoordinate_of_img1,ycoordinate_of_img1,xcoordinate_of_img1 + img1.width ,ycoord_of_img1 +img1.height );
-                
-                console.log('@@@@@@@@@@@@@@@@@@ 그리고', x)
-                // 지우고 그렵   ㅗ자
-                laserContext.drawImage(imgTag, x, y); // clearRect
-                laserContext.clearRect(x, y , imgTag.width, imgTag.height);
-                
-                tempX.push(x);
-                tempY.push(y);
+                laserboard.style.cursor = 'none';
 
-                if (tempX.length === 2) {
-                    console.log('################# 지우고', tempX[0])
-                    laserContext.clearRect(tempX[0], tempY[0] , imgTag.width, imgTag.height);
-                    tempX.shift()
-                    tempY.shift()
-                } else {
-                    console.log('안지운다')
+                laser.width = pointer.width
+                laser.height = pointer.height
+                
+                laser.pos.push({x, y})
+                if (laser.pos.length === 2) {
+                    laserContext.clearRect(laser.pos[0].x, laser.pos[0].y , laser.width, laser.height);
+                    laser.pos.shift()
+                    
                 }
-                
-                // if (x좌표 ||)
-                
-              
-
+                laserContext.drawImage(pointer, laser.pos[0].x, laser.pos[0].y); // clearRect
                 
             }
         }
     }
 
-    let  laserEndHandler= function(event) {
+    let laserOutHandler = function(event) {
+
+        laserContext.clearRect(laser.pos[0].x, laser.pos[0].y , laser.width, laser.height);
+    }
+
+    let laserEndHandler = function(event) {
         
     }
 
     let laserpointHandler = function(event) {
         console.log('## whiteboard controller [ laserpointHandler ]')
-        isLaserpointing = true
+        laser.enable = true
     }
 
     let eraserHandler = function(event) {
@@ -227,6 +227,7 @@ const WhiteBoard = (function() {
         laserStartHandler,
         laserMoveHandler,
         laserEndHandler,
+        laserOutHandler,
     }
     
 })();

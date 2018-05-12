@@ -19,6 +19,8 @@
             float: right;
         }
     </style>
+
+
 </head>
 <body>
     
@@ -39,7 +41,31 @@
         
     </div>
 
+    <!-- Copying socket.io.js to a public folder (something as resources/js/socket.io.js) is not the proper way to do it.
+
+If Socket.io server listens properly to your HTTP server, it will automatically serve the client file 
+to via http://localhost:<port>/socket.io/socket.io.js, 
+    you don't need to find it or copy in a publicly accessible folder as resources/js/socket.io.js & serve it manually. -->
+    <script src="http://125.142.179.191:7777/socket.io/socket.io.js"></script>
+    <script src="../script/config/default.js"></script>
+    <script src="../script/socket/socketEvent.js"></script>
+    <script src="../script/socket/socketInfo.js"></script>
+
     <script src="../script/controllers/whiteboardController.js"></script>
     <script src="../script/services/whiteboardService.js"></script>
+    <script>
+        let signalURL = config.signalURL;
+        let signalPort = config.signalPort;
+
+        AppSocket.init({io, signalURL, signalPort}, function(socket) {
+            socketInfo.instance = socket;
+            socket.on(config.socketEventName, AppSocket.socketEventHandler);
+
+
+            AppSocket.sendMessage(config.socketEventName, {
+                'zzz':'zzz'
+            })   
+        })
+    </script>
 </body>
 </html>

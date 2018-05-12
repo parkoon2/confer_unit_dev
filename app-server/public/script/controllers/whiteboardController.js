@@ -2,9 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
     const drawboard = document.getElementById('drawboard');
     const laserboard = document.getElementById('laserboard');
-    
-    
-    
     const eraser = document.getElementById('eraser');
     const highlighter = document.getElementById('highlighter');
     const pen = document.getElementById('pen');
@@ -53,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         laserboard.addEventListener('mousedown', WhiteBoard.laserStartHandler);
         laserboard.addEventListener('mouseup', WhiteBoard.laserEndHandler);
         laserboard.addEventListener('mousemove', WhiteBoard.laserMoveHandler);
+        laserboard.addEventListener('mouseout', WhiteBoard.laserOutHandler);
         
 
     })
