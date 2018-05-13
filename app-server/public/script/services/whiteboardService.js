@@ -19,7 +19,7 @@ const WhiteBoard = (function() {
         enable: false
     }
 
-    let init = function(data, callback) {
+    function init(data, callback) {
         console.log('## whiteboard service [init]', data);
         try {
             drawboard = data.drawboard;
@@ -34,7 +34,7 @@ const WhiteBoard = (function() {
     }
 
     
-    let drawStartHandler = function(event) {
+    function drawStartHandler(event) {
         
         // If you are using laser pointer, you are not able to use drawing
         if (!laser.enable) draw.enable = true;
@@ -46,42 +46,40 @@ const WhiteBoard = (function() {
             status = 'start';
             
             if (tooltype === 'pen') {
-                doDraw({
+                doDrawing({
                     x,
                     y,
                     status
-                })
+                }, true)
             }            
         }
     }
 
-    let drawEndHandler = function(event) {
+    function drawEndHandler(event) {
         draw.enable = false;
-        console.log('ss')
         drawContext.closePath();
     }
 
-    let drawMoveHandler = function(event) {
+    function drawMoveHandler(event) {
         let bounds = event.target.getBoundingClientRect();
         x = event.pageX - bounds.left - scrollX;
         y = event.pageY - bounds.top - scrollY;
         if (draw.enable) {
         
-        
             status = 'move'
 
             if (tooltype === 'pen') {
-                doDraw({
+                doDrawing({
                     x,
                     y,
                     status
-                })
+                }, true)
             }
         
         }
     }
 
-    let penHandler = function(event) {
+    function penHandler(event) {
         console.log('## whiteboard controller [ penHandler ]')
         // 임시..
         // 나중에 레이저 포인터 아이콘에서 포커스 사라졌을 때 처리할 것!
@@ -99,19 +97,112 @@ const WhiteBoard = (function() {
         
     }
 
-    let laserStartHandler = function(event) {
+    function laserStartHandler(event) {
 
     }
 
 
 
-    let  laserMoveHandler = function(event) {
+    function laserMoveHandler(event) {
         let bounds = event.target.getBoundingClientRect();
         x = event.pageX - bounds.left - scrollX;
         y = event.pageY - bounds.top - scrollY;
 
-        
+        doLaser({
+            x,
+            y,
+        }, true)
+    }
+
+    function laserOutHandler(event) {
         if (laser.enable) {
+            laserContext.clearRect(laser.pos[0].x, laser.pos[0].y , laser.width, laser.height);
+        }
+    }
+
+    function laserEndHandler(event) {
+        
+    }
+
+    function laserpointHandler(event) {
+        console.log('## whiteboard controller [ laserpointHandler ]')
+        laser.enable = true
+    }
+
+    function eraserHandler(event) {
+        console.log('## whiteboard controller [ eraserHandler ]')
+        drawContext.globalCompositeOperation = 'destination-out';
+        drawContext.fillStyle = '#ffffff';
+        drawContext.strokeStyle = '#ffffff';
+        drawContext.lineWidth = _toolbar.eraser.size;
+    }
+
+    function highlighterHandler(event) {
+    console.log('## whiteboard controller [ highlighterHandler ]')
+        drawContext.globalCompositeOperation = 'destination-atop';
+        drawContext.strokeStyle = 'rgba(255,255,0,0.4)';
+    }
+
+    function colorRedHandler(event) {
+        drawContext.strokeStyle = '#ff0000';
+        console.log('## whiteboard controller [ colorRedHandler ]')
+        
+        
+    }
+
+    function colorBlackHandler(event) {
+        drawContext.strokeStyle = '#000000';
+        console.log('## whiteboard controller [ colorBlackHandler ]')
+    }
+
+    function thicknessBigHandler(event) {
+        if (lineSize < 12) {
+            lineSize ++;
+            console.log('증가')
+        }
+        console.log(drawContext.lineWidth)
+        drawContext.lineWidth = lineSize;
+    }
+    function thicknessSmallHandler(event) {
+        if (lineSize > 3) {
+            lineSize --;
+        }
+        drawContext.lineWidth = lineSize;
+    }
+
+    function doDrawing(data, emit) {
+        
+        if (data.status === 'start') {
+            drawContext.beginPath();
+            drawContext.moveTo(data.x, data.y);
+            drawContext.lineTo(data.x, data.y);
+            drawContext.stroke();
+        }
+        
+        if (data.status === 'move') {
+            drawContext.lineTo(data.x, data.y);
+            drawContext.stroke();
+        }
+
+        if (data.status === 'end') {
+        }
+
+        // when you recive the event(when you are reciver), you are not able to call this function
+        if (!emit) { return; }
+        AppSocket.sendMessage(config.socketEventName, {
+            signalOp: 'Draw',
+            x: data.x,
+            y: data.y,
+            status
+        })
+    }
+
+    function doLaser(data, emit) {
+
+        // laser.enable value is for Sender
+        // emit value is for Reciever
+        if (laser.enable || !emit) {
+            console.log('zz')
             pointer = new Image();
             pointer.src = '../image/point.png'; 
             pointer.onload = function() {
@@ -121,98 +212,47 @@ const WhiteBoard = (function() {
                 laser.width = pointer.width
                 laser.height = pointer.height
                 
-                laser.pos.push({x, y})
+                laser.pos.push({
+                    x: data.x,
+                    y: data.y,
+                });
                 if (laser.pos.length === 2) {
                     laserContext.clearRect(laser.pos[0].x, laser.pos[0].y , laser.width, laser.height);
                     laser.pos.shift()
                     
                 }
                 laserContext.drawImage(pointer, laser.pos[0].x, laser.pos[0].y); // clearRect
-                
             }
+
+            if (!emit) { return; }
+
+            AppSocket.sendMessage(config.socketEventName, {
+                eventOp: 'Laser',
+                x: data.x,
+                y: data.y,
+            })
         }
     }
 
-    let laserOutHandler = function(event) {
+    function onDrawingEvent() {
 
-        laserContext.clearRect(laser.pos[0].x, laser.pos[0].y , laser.width, laser.height);
     }
 
-    let laserEndHandler = function(event) {
-        
-    }
+    function throttle(callback, delay) {
+        let previousCall = new Date().getTime();
 
-    let laserpointHandler = function(event) {
-        console.log('## whiteboard controller [ laserpointHandler ]')
-        laser.enable = true
-    }
+        return function() {
+          let time = new Date().getTime();
+          if ((time - previousCall) >= delay) {
+            previousCall = time;
+            callback.apply(null, arguments);
+          }
+        };
+      }
 
-    let eraserHandler = function(event) {
-        console.log('## whiteboard controller [ eraserHandler ]')
-        drawContext.globalCompositeOperation = 'destination-out';
-        drawContext.fillStyle = '#ffffff';
-        drawContext.strokeStyle = '#ffffff';
-        drawContext.lineWidth = _toolbar.eraser.size;
-    }
-
-    let highlighterHandler = function(event) {
-        console.log('## whiteboard controller [ highlighterHandler ]')
-        drawContext.globalCompositeOperation = 'destination-atop';
-        drawContext.strokeStyle = 'rgba(255,255,0,0.4)';
-    }
-
-    let colorRedHandler = function(event) {
-        drawContext.strokeStyle = '#ff0000';
-        console.log('## whiteboard controller [ colorRedHandler ]')
-        
-        
-    }
-
-    let colorBlackHandler = function(event) {
-        drawContext.strokeStyle = '#000000';
-        console.log('## whiteboard controller [ colorBlackHandler ]')
-    }
-
-    let thicknessBigHandler = function(event) {
-        if (lineSize < 12) {
-            lineSize ++;
-            console.log('증가')
-        }
-        console.log(drawContext.lineWidth)
-        drawContext.lineWidth = lineSize;
-    }
-    let thicknessSmallHandler = function(event) {
-        if (lineSize > 3) {
-            lineSize --;
-        }
-        drawContext.lineWidth = lineSize;
-    }
-
-    let doDraw = function(data) {
-
-        if (data.status === 'start') {
-            drawContext.beginPath();
-            drawContext.moveTo(data.x, data.y);
-            drawContext.lineTo(data.x, data.y);
-            drawContext.stroke();
-            
-            return;
-        }
-        
-        if (data.status === 'move') {
-            console.log(drawContext.lineWidth)
-            drawContext.lineTo(data.x, data.y);
-            drawContext.stroke();
-            return;
-        }
-
-        if (data.status === 'end') {
-            return;
-        }
-    }
-    
     return {
         init,
+        doDrawing,
         drawStartHandler,
         drawEndHandler,
         drawMoveHandler,
@@ -228,6 +268,7 @@ const WhiteBoard = (function() {
         laserMoveHandler,
         laserEndHandler,
         laserOutHandler,
+        throttle,
+        doLaser,
     }
-    
 })();

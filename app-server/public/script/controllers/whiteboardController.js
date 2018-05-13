@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         drawboard.addEventListener('mousedown', WhiteBoard.drawStartHandler);
         drawboard.addEventListener('mouseup', WhiteBoard.drawEndHandler);
-        drawboard.addEventListener('mousemove', WhiteBoard.drawMoveHandler);
+        drawboard.addEventListener('mousemove', WhiteBoard.throttle(WhiteBoard.drawMoveHandler, 10));
 
 
         laserboard.addEventListener('mousedown', WhiteBoard.laserStartHandler);

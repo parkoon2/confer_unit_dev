@@ -6,40 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 
-    <style>
-        canvas {
-            border: 3px solid black;
-        }
-        #log {
-            border: 3px solid black;
-            width: 100%;
-            height: 500px;
-        }
-        #toolbar {
-            float: right;
-        }
-    </style>
-
-
 </head>
 <body>
     
-    <canvas id="drawboard" width="800" height="500"></canvas>
-    <canvas id="laserboard" width="800" height="500"></canvas>
-    <div id="toolbar">
-            <button id="pen"> 펜 </button>
-            <button id="eraser"> 지우개 </button>
-            <button id="highlighter"> 형광펜</button>
-            <button id="color-red"> 빨간색 </button>
-            <button id="color-black"> 검정색 </button>
-            <button id="color-black"> 검정색 </button>
-            <button id="thickness-big"> 두껍게 </button>
-            <button id="thickness-small"> 얇게 </button>
-            <button id="laserpoint"> 레이저포인트 </button>
-        </div>
-    <div id="log">
-        
-    </div>
+   <input id="friendsInput" type="text">
+   <button id="getFriendsBtn" >친구주세요</button>
 
     <!-- Copying socket.io.js to a public folder (something as resources/js/socket.io.js) is not the proper way to do it.
 
@@ -50,8 +21,8 @@ to via http://localhost:<port>/socket.io/socket.io.js,
     <script src="../script/config/default.js"></script>
     <script src="../script/socket/socketInfo.js"></script>
     
-    <script src="../script/controllers/whiteboardController.js"></script>
-    <script src="../script/services/whiteboardService.js"></script>
+    <script src="../script/controllers/friendController.js"></script>
+    <script src="../script/services/friendService.js"></script>
     <script src="../script/socket/socketEvent.js"></script>
     <script>
         let signalURL = config.signalURL;
@@ -60,7 +31,6 @@ to via http://localhost:<port>/socket.io/socket.io.js,
         AppSocket.init({io, signalURL, signalPort}, function(socket) {
             socketInfo.instance = socket;
             socket.on(config.socketEventName, AppSocket.socketEventHandler);
-
         })
     </script>
 </body>

@@ -1,6 +1,6 @@
 const AppSocket = (function() {
     
-    let init = function(data, callback) {
+    function init(data, callback) {
         try {
             let signalSocket = data.io.connect(`${data.signalURL}:${data.signalPort}`);
             callback(signalSocket);
@@ -9,11 +9,20 @@ const AppSocket = (function() {
         }
     }
 
-    let socketEventHandler = function(data) {
-        console.log('###############', data);
+    function socketEventHandler(data) {
+        let op = data.signalOp || data.eventOp;
+
+        switch (op) {
+            case 'Draw':
+            WhiteBoard.doDrawing(data, false)
+            break;
+            case 'Laser':
+            WhiteBoard.doLaser(data, false)
+            break;
+        }
     }
 
-    let sendMessage = function(eventName, message) {
+    function sendMessage(eventName, message) {
         console.log(`## AppSocket [sendMessage] | PC --> Siganl |`, eventName, message)
         try {
             socketInfo.instance.emit(eventName, message);

@@ -14,6 +14,7 @@ const socket = require('socket.io')
 // Routes
 const index = require('./js/routes/index');
 const sharing = require('./js/routes/sharing');
+const manage = require('./js/routes/manage');
 
 // Set EJS
 app.set('views', path.join(__dirname, '/public/views'));
@@ -27,23 +28,13 @@ app.use(express.static('public'));
 //app.use('/', router)
 app.use('/', index);
 app.use('/sharing', sharing);
+app.use('/manage', manage);
 
 // router.use('/', function(req, res, next) {
 //     console.log(req.method, req.url)
 
 //     next()
 // });
-
-let io = socket.listen(server);
-
-io.sockets.on('connection', function(socket) {
-    console.log(`${socket.id} is connected`)
-    
-    socket.on('parkoon', function(data) {
-        console.log(data)
-    }) 
-});
-
 
 // router.param('name', function(req, res, next, name) {
 //     // do validation on name here

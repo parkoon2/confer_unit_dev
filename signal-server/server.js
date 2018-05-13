@@ -19,6 +19,7 @@ io.sockets.on('connection', function(socket) {
     console.log(`${socket.id} is connected`)
     
     socket.on('parkoon', function(data) {
+        socket.broadcast.emit('parkoon', data)
         console.log(data)
     }) 
 });
