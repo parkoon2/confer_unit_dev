@@ -11,18 +11,28 @@
     
    <input id="friendsInput" type="text">
    <button id="getFriendsBtn" >친구주세요</button>
+   <input type="radio" name="test" value="1">Male</input>
+   <input type="radio" name="test" value="0" >Female</input>
+   <ul id="friendsArea">
+
+   </ul>
+
+   <ul id="friendBasket">
+
+   </ul>
 
     <!-- Copying socket.io.js to a public folder (something as resources/js/socket.io.js) is not the proper way to do it.
 
 If Socket.io server listens properly to your HTTP server, it will automatically serve the client file 
 to via http://localhost:<port>/socket.io/socket.io.js, 
     you don't need to find it or copy in a publicly accessible folder as resources/js/socket.io.js & serve it manually. -->
-    <script src="http://125.142.179.191:7777/socket.io/socket.io.js"></script>
+    <script src="http://localhost:7777/socket.io/socket.io.js"></script>
     <script src="../script/config/default.js"></script>
     <script src="../script/socket/socketInfo.js"></script>
     
     <script src="../script/controllers/friendController.js"></script>
     <script src="../script/services/friendService.js"></script>
+    <script src="../script/services/commonService.js"></script>
     <script src="../script/socket/socketEvent.js"></script>
     <script>
         let signalURL = config.signalURL;

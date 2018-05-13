@@ -11,14 +11,19 @@ const AppSocket = (function() {
 
     function socketEventHandler(data) {
         let op = data.signalOp || data.eventOp;
-
+        console.log('## AppSocket [socketEventHandler] | Siganl --> PC | parkoon', data)
+        
         switch (op) {
             case 'Draw':
-            WhiteBoard.doDrawing(data, false)
-            break;
+                WhiteBoard.doDrawing(data, false)
+                break;
             case 'Laser':
-            WhiteBoard.doLaser(data, false)
-            break;
+                WhiteBoard.doLaser(data, false)
+                break;
+            case 'Friends':
+                Common.eventGenerator('getFriends', data)
+                break;
+
         }
     }
 
