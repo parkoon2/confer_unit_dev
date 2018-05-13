@@ -21,6 +21,21 @@
 
    </ul>
 
+
+   ========================================== 유효성 체크 ==================
+   <div>
+       <input type="password" id="firstPass">
+       <input type="password" id="secondPass">
+
+       <button id="passOk">PASS OK?</button>
+   </div>
+
+   <div>
+        <input type="text" id="email">
+ 
+        <button id="mailOk">EMAIL OK?</button>
+    </div>
+
     <!-- Copying socket.io.js to a public folder (something as resources/js/socket.io.js) is not the proper way to do it.
 
 If Socket.io server listens properly to your HTTP server, it will automatically serve the client file 
@@ -33,6 +48,7 @@ to via http://localhost:<port>/socket.io/socket.io.js,
     <script src="../script/controllers/friendController.js"></script>
     <script src="../script/services/friendService.js"></script>
     <script src="../script/services/commonService.js"></script>
+    <script src="../script/services/userService.js"></script>
     <script src="../script/socket/socketEvent.js"></script>
     <script>
         let signalURL = config.signalURL;
