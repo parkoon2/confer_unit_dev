@@ -4,6 +4,7 @@ const https = require('https');
 const path = require('path');
 const app = express();
 const config = require('./js/config/default');
+var multiparty = require('multiparty');
 const port = process.env.PORT || config.port;
 const router = express.Router();
 
@@ -15,6 +16,7 @@ const socket = require('socket.io')
 const index = require('./js/routes/index');
 const sharing = require('./js/routes/sharing');
 const manage = require('./js/routes/manage');
+const webrtc = require('./js/routes/webrtc');
 
 // Set EJS
 app.set('views', path.join(__dirname, '/public/views'));
@@ -29,6 +31,37 @@ app.use(express.static('public'));
 app.use('/', index);
 app.use('/sharing', sharing);
 app.use('/manage', manage);
+app.use('/webrtc', webrtc);
+
+
+app.post('/upload', function (req, res, next) {
+    var form = new multiparty.Form({
+        autoFiles: false,
+        uploadDir: __dirname + '\\tmp\\',
+        maxFilesSize: 1024 * 1024 * 200  // 파일 용량 제한
+    });
+
+    // file upload exeption
+    form.on('error', function (err) {
+        console.log('[upload_test.js]' + err);
+        throw err;
+    });
+
+    // get uploader field key&value
+    form.on('field', function (name, value) {
+        console.log('[upload_test.js] form name: ' + name + ', value: ' + value);
+    });
+
+    form.on('progress', function (byteRead, byteExpected) {
+        console.log('[upload_test.js] Reading total  ' + byteRead + '/' + byteExpected);
+    });
+
+    form.parse(req, function (err, fields, files) {
+        console.log('################## fields', fields)
+        console.log('################## files',files)
+    })
+
+});
 
 // router.use('/', function(req, res, next) {
 //     console.log(req.method, req.url)

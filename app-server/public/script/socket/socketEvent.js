@@ -15,14 +15,39 @@ const AppSocket = (function() {
         
         switch (op) {
             case 'Draw':
-                WhiteBoard.doDrawing(data, false)
+                WhiteBoard.doDrawing(data, false);
                 break;
             case 'Laser':
-                WhiteBoard.doLaser(data, false)
+                WhiteBoard.doLaser(data, false);
                 break;
             case 'Friends':
-                Common.eventGenerator('getFriends', data)
+                Common.eventGenerator('getFriends', data);
                 break;
+            case 'Call':
+                Common.eventGenerator('successCall', data);
+                break;
+            case 'Invite':
+                Common.eventGenerator('recvInvite', data);
+                break;
+            case 'Join':
+                Common.eventGenerator('successJoin', data);
+                break;
+            case 'SDP':
+                if ('sdpOffer' in data) {
+                    Common.eventGenerator('getOfferSDP', data);
+                }
+
+                if ('sdpAnswer' in data) {
+                    Common.eventGenerator('getAnswerSDP', data);
+                }
+                break;
+            case 'Candidate':
+                Common.eventGenerator('getCandidate', data);
+                break;
+            case 'ExitRoom':
+                Common.eventGenerator('exitRoom', data);
+                break;
+            
 
         }
     }

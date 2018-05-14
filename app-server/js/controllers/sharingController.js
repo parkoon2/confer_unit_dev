@@ -4,6 +4,13 @@ function whiteboard(req, res) {
     })
 }
 
+function file(req, res) {
+    res.render('fileshare', {
+        
+    })
+}
+
 module.exports = {
     whiteboard,
+    file,
 }

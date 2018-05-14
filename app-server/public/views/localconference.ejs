@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+</head>
+<body>
+    
+    <button id="callBtn">전화걸기</button>
+    <button id="joinBtn">전화받기</button>
+    <button id="exitBtn">전화끊기</button>
+
+    <video src="" id="remoteVideo" width="500" height="500" autoplay></video>
+    <video src="" id="localVideo" width="500" height="500" autoplay></video>
+
+
+    <!-- Copying socket.io.js to a public folder (something as resources/js/socket.io.js) is not the proper way to do it.
+
+If Socket.io server listens properly to your HTTP server, it will automatically serve the client file 
+to via http://localhost:<port>/socket.io/socket.io.js, 
+    you don't need to find it or copy in a publicly accessible folder as resources/js/socket.io.js & serve it manually. -->
+    <script src="http://localhost:7777/socket.io/socket.io.js"></script>
+    <script src="../script/config/default.js"></script>
+    <script src="../script/config/object.js"></script>
+    <script src="../script/socket/socketInfo.js"></script>
+    <script src="../script/socket/socketEvent.js"></script>
+    <script src="../script/services/commonService.js"></script>
+
+
+    <script src="../script/services/localconferenceService.js"></script>
+    <script src="../script/controllers/localconferenceController.js"></script>
+    <script>
+        let signalURL = config.signalURL;
+        let signalPort = config.signalPort;
+
+        AppSocket.init({io, signalURL, signalPort}, function(socket) {
+            socketInfo.instance = socket;
+            socket.on(config.socketEventName, AppSocket.socketEventHandler);
+        })
+    </script>
+</body>
+</html>

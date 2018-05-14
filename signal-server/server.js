@@ -35,9 +35,25 @@ io.sockets.on('connection', function(socket) {
         if (op === 'Friends') {
             data.friends = friends;
             io.to(socket.id).emit('parkoon', data)
-        } else {
+        } else if (op ==='Call') {
+            io.to(socket.id).emit('parkoon', data)
+            data.eventOp = 'Invite';
+            socket.broadcast.emit('parkoon', data)
+        } else if (op ==='Join') {
+            io.to(socket.id).emit('parkoon', data)
+        } else if (op ==='Inivte') {
+        } else if (op ==='SDP') {
+            socket.broadcast.emit('parkoon', data)
+        } else if (op ==='Candidate') {
+            socket.broadcast.emit('parkoon', data)
+        } else if (op ==='ExitRoom') {
             socket.broadcast.emit('parkoon', data)
         }
+        else {
+            //socket.broadcast.emit('parkoon', data)
+        }
+        
+     
         console.log(data)
     }) 
 });
