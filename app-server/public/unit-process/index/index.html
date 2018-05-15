@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <!-- really dirty! this is just a test drive ;) -->
+
+    <script type="text/javascript" src="./build/pdf.js"></script>
+    <script type="text/javascript">
+
+        function renderPDF(url) {
+            PDFJS.getDocument(url).then((pdf) => {
+                for (let i = 1; i <= pdf.numPages; i += 1) {
+                    const canvas = document.createElement('canvas');
+                    /* This indentify the canvas as the location of the page */
+                    canvas.id = 'pdf'+i;
+                    document.getElementById('holder').appendChild(canvas);
+                    pdf.getPage(i).then((page) => {
+                        renderPage(page, canvas);
+                    });
+                }
+            });
+        }
+
+        function renderPage(page, canvas) {
+            const viewport = page.getViewport(1);
+            const canvasContext = canvas.getContext('2d');
+            const renderContext = {
+                canvasContext,
+                viewport
+            };
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            var task = page.render(renderContext);
+            task.promise.then(function () {
+                // console.log(canvas.toDataURL('image/png'));
+                var link = document.createElement('a');
+                alert(canvas.id+'.png');
+                link.download = canvas.id+'.png';
+                link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                link.click();
+            });
+            
+        }
+
+// function renderPDF(url, canvasContainer, options) {
+//     var pageTemp = 0;
+//     var options = options || { scale: 1 };
+
+//     function renderPage(page) {
+//         var viewport = page.getViewport(options.scale);
+//         var canvas = document.createElement('canvas');
+//         var ctx = canvas.getContext('2d');
+//         var renderContext = {
+//           canvasContext: ctx,
+//           viewport: viewport
+//         };
+
+//         canvas.height = viewport.height;
+//         canvas.width = viewport.width;
+//         canvasContainer.appendChild(canvas).setAttribute("id", "abc"+pageTemp++);
+
+//         page.render(renderContext);
+//     }
+
+//     function renderPages(pdfDoc) {
+//         for(var num = 1; num <= pdfDoc.numPages; num++) {
+//             alert(num);
+//             pdfDoc.getPage(num).then(renderPage);
+//         }
+//     }
+//     PDFJS.disableWorker = true;
+//     PDFJS.getDocument(url).then(renderPages);
+
+//     var canvas = document.getElementsByTagName('canvas');
+// }   
+    </script>
+
+    <div id="holder"></div>
+
+    <script type="text/javascript">
+        renderPDF('sample.pdf', document.getElementById('holder'));
+    </script>
+
+</body>
+
+</html>
