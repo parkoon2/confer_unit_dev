@@ -52,6 +52,10 @@ const AppSocket = (function() {
         }
     }
 
+    function tempHandler(data) {
+        console.log('!!!!!!!!!!!!!!!!!!', data)
+    }
+
     function sendMessage(eventName, message) {
         console.log(`## AppSocket [sendMessage] | PC --> Siganl |`, eventName, message)
         try {
@@ -64,7 +68,8 @@ const AppSocket = (function() {
     return {
         init,
         socketEventHandler,
-        sendMessage
+        sendMessage,
+        tempHandler
     }
 
 })();

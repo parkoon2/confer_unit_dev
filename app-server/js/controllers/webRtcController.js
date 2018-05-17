@@ -4,6 +4,11 @@ function localconference(req, res) {
     })
 }
 
+function multiconference(req, res) {
+    res.render('multiconference', {});
+}
+
 module.exports = {
     localconference,
+    multiconference
 }
