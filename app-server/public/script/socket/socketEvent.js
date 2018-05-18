@@ -53,7 +53,13 @@ const AppSocket = (function() {
     }
 
     function tempHandler(data) {
-        console.log('!!!!!!!!!!!!!!!!!!', data)
+        let op = data.eventOp;
+        if (op === 'answer') {
+            MultiVideo.peer.processAnswer(data.sdpAnswer);
+        } else if (op ==='candidate') {
+            MultiVideo.peer.addIceCandidate(data.candidate);
+        }
+        
     }
 
     function sendMessage(eventName, message) {

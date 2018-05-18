@@ -7,11 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const localVideo = document.getElementById('localVideo');
 
 
-
-        var options = {
+        let options = {
             localVideo: undefined,
             remoteVideo: remoteVideo,
-            onicecandidate : onIceCandidate,
+            onicecandidate : MultiConference.onIceCandidate,
             mediaConstraints: {
                 audio: true,
                 video: {
@@ -20,27 +19,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     framerate: 24
                 }
             },
-            // onnegotiationneeded: function(){
-            //     alert('onnegotiationneeded called');
-
-            // }
         }
 
         callBtn.addEventListener('click', function() {
-            LocalConference.getPeer(options, function(err, peer) {
+            MultiConference.getPeer(options, function(err, peer) {
+                console.log('## 피어생성 ##')
                 MultiVideo.peer = peer;
-                console.log(peer)
-                MultiVideo.peer.generateOffer(LocalConference.onOffer)
+                MultiVideo.peer.generateOffer(MultiConference.onOffer)
             });
 
         })
 
-        function onIceCandidate(candidate) {
-            console.log('Local candidate' + JSON.stringify(candidate));
-          //  if (state == I_CAN_START){
-            AppSocket.sendMessage(config.multiEventName, {
-                id: 'candidate',
-                candidate: candidate,
-            })
-        }
+
 });    

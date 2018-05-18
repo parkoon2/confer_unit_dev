@@ -29,7 +29,7 @@ var webrtcUtils = {
         typeof require === 'function' && typeof define === 'function') {
       return;
     }
-    console.log.apply(console, arguments);
+   // console.log.apply(console, arguments);
   },
   extractVersion: function(uastring, expr, pos) {
     var match = uastring.match(expr);

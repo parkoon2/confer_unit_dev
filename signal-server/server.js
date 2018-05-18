@@ -61,60 +61,99 @@ io.sockets.on('connection', function(socket) {
         else {
             //socket.broadcast.emit('parkoon', data)
         }
-        console.log(data)
     });
 
 
-
-
-
-
-
-
-
-
-
     socket.on('multiconfer', function(data) {
-        let id = data.id;
+        let eventOp = data.eventOp;
        
-        switch (id) {
-            case 'client':
+        switch (eventOp) {
+            case 'sdp':
                 let sdpOffer = data.offerSdp;
                 getKurentoClient(mediaserver, function(err, client) {
                     if (err) { throw err; }
                     kurentClient = client;
                     getMediaPipeline(kurentClient, function(err, pipe) {
                         if (err) { throw err; }
+                        console.log('############## Create Pipeline')
+                        
                         mediaPipeline = pipe;
                         createWebRtcEndPoint(mediaPipeline, function(err, endpoint) {
-                            console.log('createWebRtcEndPoint')
+                            console.log('############## Create Endpoint')
                             webRtcEndpoint = endpoint;
                             
-                            webRtcEndpoint.on('OnIceCandidate', function(event) {
-                                console.log("## candidate ##");
-                                // var candidate = kurento.register.complexTypes.IceCandidate(event.candidate);
-                                // ws.send(JSON.stringify({
-                                //     id : 'iceCandidate',
-                                //     candidate : candidatecandidate
-                                // }));
-                            });
+                            // webRtcEndpoint.on('OnIceCandidate', function(event) {
+                            //     console.log("## candidate ##");
+                            //     io.to(socket.id).emit('multiconfer', {
+                            //         eventOp: 'candidate',
+                            //         candidate: event.candidate,
+                            //     })
+                            // });
 
-                            candiQue.forEach(function(candi) {
-                                webRtcEndpoint.addIceCandidate(candi);
-                            })
+                            // candiQue.forEach(function(candi) {
+                            //     webRtcEndpoint.addIceCandidate(candi);
+                            // })
 
-                            console.log('sdpOffer', sdpOffer)
                             webRtcEndpoint.processOffer(sdpOffer, function(err, sdpAnswer) {
                                 
                                 if (err) {
                                     console.log(err)
                                 }
-                                console.log('!', sdpAnswer)
-
                                 io.to(socket.id).emit('multiconfer', {
-                                    sdpAnswer: sdpAnswer
+                                    eventOp: 'answer',
+                                    sdpAnswer: sdpAnswer,
                                 })
                             });
+
+
+                            webRtcEndpoint.gatherCandidates(function(err) {
+                                if (err) console.log(err);
+
+                            });
+
+
+                            var filter;
+                            console.log('필터시작')
+
+                            createFilter(mediaPipeline,'capsfilter caps=video/x-raw,wgcp_participant=' + 4, 'VIDEO', function(videoObj) {
+                                filter = videoObj;
+                                getComposite(mediaPipeline, function(composite) {
+
+                                    composite.on('_rpc', function(err, event) {
+
+                                    }, function(err) {
+                                        console.log(err)
+                                    })
+                                    
+                                    createHubPort(composite, function(hurb) {
+                                        console.log('!!!!!!!!!!!!!', hurb)
+                                        webRtcEndpoint.connect(hurb, function(err, event) {
+                                            if (err) console.log(err)
+                                            hurb.getSinkConnections(function(err, event, result) {
+                                                if (err) console.log(err)
+                                            
+                                                //console.log(event)
+                                            })
+                                        })
+
+                                        hurb.connect(webRtcEndpoint, function(){
+                                            console.log('!!!!!!!!!!!!!!!!!!!!!connect')
+                                            // console.log("clients[id].hubPort.setMaxOutputBitrate(2000) : ",clients[id].hubPort.getMaxOutputBitrate(function(err, event){
+                                            //     console.log("$$$$$$ value $$$$$$ : ",err, event);
+                                            // }));
+                                        });
+                                    })
+
+                                })
+                            })
+                            // createFilter(mediaPipeline,'capsfilter caps=video/x-raw,wgcp_participant=' + 4, 'VIDEO').then(function(videoObj){
+                            //         filter = videoObj;
+                            //         console.log('videoObj', videoObj)
+                            //         return getComposite(mediaPipeline);
+                            //         //return createFilter(mediaPipeline,'videorate max-rate=2', 'VIDEO');
+                            // }).then(function() {
+                            //     console.log('!!!!!!!!!!!!!!!!')
+                            // })
 
                         })
                     })
@@ -129,7 +168,16 @@ io.sockets.on('connection', function(socket) {
 });
 
 
-
+function createHubPort(_composite, callback) {
+    _composite.createHubPort( function(error, _hubPort) {
+        //iamabook..console.log("***** Creating hubPort *******");
+        if (error) {
+            console.log(error);
+        }else{
+            callback(_hubPort);
+        }
+    });
+}
 
 function getKurentoClient(url, callback) {
     kurento(url, function(err, _kurentoClient ) {
@@ -138,6 +186,20 @@ function getKurentoClient(url, callback) {
         }
         callback(null, _kurentoClient)
     
+    });
+}
+
+function getComposite(_pipeline, callback) {
+	//iamabook..console.log("***** getComposite ******");
+    _pipeline.create( 'Composite',  function( error, _composite ) {
+        //console.log("creating Composite");
+        if (error) {
+            console.log(error);
+        }
+        composite = _composite;
+        console.log("iamabook. COMPOSITE ID IS::: ", _composite.id);
+
+        callback(composite);
     });
 }
 
@@ -153,6 +215,25 @@ function createWebRtcEndPoint(pipe, callback) {
         if (err) { callback(err, null); }
         callback(null, endpoint);
     })
+}
+
+function createFilter(_pipeline, _command, _type, callback){
+	let command = _command;
+	let type    = _type;
+    console.log('createFilter')
+    let options = {
+        //command    : 'videoflip method=4',
+        //command    : 'videorate max-rate=10',
+        command    : command,
+        filterType : type
+    }
+    _pipeline.create('GStreamerFilter', options, function(error, filter){
+        if(error){
+            console.log(error)
+        }else{
+            callback(filter)
+        }
+    });
 }
 
 

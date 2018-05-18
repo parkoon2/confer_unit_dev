@@ -1,4 +1,4 @@
-const LocalConference = (function() {
+const MultiConference = (function() {
     
     function getPeer(options, callback) {
         try {
@@ -16,13 +16,22 @@ const LocalConference = (function() {
         if (err) { throw err; }
 
         AppSocket.sendMessage(config.multiEventName, {
-            id: 'client',
+            eventOp: 'sdp',
             offerSdp: offerSdp,
+        })
+    }
+
+    function onIceCandidate(candidate) {
+        console.log(' ## Local candidate onIceCandidate')
+        AppSocket.sendMessage(config.multiEventName, {
+            eventOp: 'candidate',
+            candidate: candidate,
         })
     }
 
     return {
         getPeer,
         onOffer,
+        onIceCandidate,
     }
 })();

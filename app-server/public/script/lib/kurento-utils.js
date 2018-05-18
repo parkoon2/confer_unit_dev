@@ -189,7 +189,6 @@ function WebRtcPeer(mode, options, callback) {
 
     //iamabook.
     this.applyConstraints = function(constraints){
-      console.log("iamabook....");
       if(pc){
         var track = pc.getRemoteStreams()[0].getVideoTracks()[0];
 
@@ -203,7 +202,7 @@ function WebRtcPeer(mode, options, callback) {
 
     this.addIceCandidate = function (iceCandidate, callback) {
         var candidate = new RTCIceCandidate(iceCandidate);
-        console.log('ICE candidate received');
+        //console.log('ICE candidate received');
         callback = (callback || noop).bind(this);
         addIceCandidate(candidate, callback);
     };
@@ -227,7 +226,7 @@ function WebRtcPeer(mode, options, callback) {
                 optional: [{ DtlsSrtpKeyAgreement: true }]
             };
         var constraints = recursive(browserDependantConstraints, connectionConstraints);
-        console.log('constraints: ' + JSON.stringify(constraints));
+        //console.log('constraints: ' + JSON.stringify(constraints));
 
         pc.createOffer(function (offer) {
             console.log('Created SDP offer');
@@ -253,7 +252,7 @@ function WebRtcPeer(mode, options, callback) {
             //     "m=video 9 UDP/TLS/RTP/SAVPF 100 96 97 98 99 96 101 102 123 127 122 125 107 108 109 124");
 
             pc.setLocalDescription(offer, function () {
-                console.log('Local description set', offer.sdp);
+                //console.log('Local description set', offer.sdp);
                 callback(null, offer.sdp, self.processAnswer.bind(self));
             }, callback);
         }, callback, constraints);
@@ -271,7 +270,7 @@ function WebRtcPeer(mode, options, callback) {
             remoteVideo.pause();
             remoteVideo.src = url;
             remoteVideo.load();
-            console.log('Remote URL:', url);
+            console.log('[ setRemoteVideo : 273 ] Remote URL:', url);
         }
     }
     this.showLocalVideo = function () {
@@ -284,7 +283,7 @@ function WebRtcPeer(mode, options, callback) {
                 type: 'answer',
                 sdp: sdpAnswer
             });
-        console.log('SDP answer received, setting remote description');
+        console.log('[ processAnswer : 286 ] SDP answer received, setting remote description');
         if (pc.signalingState === 'closed') {
             return callback('PeerConnection is closed');
         }
@@ -299,16 +298,14 @@ function WebRtcPeer(mode, options, callback) {
                 type: 'offer',
                 sdp: sdpOffer
             });
-        console.log('SDP offer received, setting remote description');
+        console.log(' [ processOffer : 301 ] SDP offer received, setting remote description');
         if (pc.signalingState === 'closed') {
             return callback('PeerConnection is closed');
         }
         pc.setRemoteDescription(offer, function () {
             setRemoteVideo();
             pc.createAnswer(function (answer) {
-                console.log('Created SDP answer');
                 pc.setLocalDescription(answer, function () {
-                    console.log('Local description set', answer.sdp);
                     callback(null, answer.sdp);
                 }, callback);
             }, callback);
@@ -380,12 +377,10 @@ function WebRtcPeer(mode, options, callback) {
 
     this.on('_customAddStream', function(_mediaStream){
         if(pc) {
-            console.log("1")
-            if(_mediaStream) {
-                console.log("2")
-                pc.addStream(_mediaStream);
-                console.log("3")
 
+            console.log('[_customAddStream event : 378]')
+            if(_mediaStream) {
+                pc.addStream(_mediaStream);
                 this.generateOffer(callback);
             }
 
@@ -469,8 +464,6 @@ WebRtcPeer.prototype.changeMediaConstraint = function (mediaConstraint) {
 };
 
 WebRtcPeer.prototype.customAddStream = function (_mediaStream) {
-    console.log(_mediaStream);
-
     webRtcPeer.emit('_customAddStream', _mediaStream);
 };
 
