@@ -1,22 +1,21 @@
 const FileShare = (function() {
 
-    function sendFiles(files) {
+    let _each = Array.prototype.forEach;
+
+    function sendFiles(files, callback) {
         let formData = new FormData();
         for (let i = 0 ; i < files.length ; i ++) {
             let file = files[i];
             let ext = file.name.substring(file.name.lastIndexOf('.') + 1).toUpperCase();
             formData.append(ext, file);
         }
-        console.log(';2')
         let xhr = new XMLHttpRequest(); 
         xhr.onload = function() {
-            if ( xhr.status === 200 || xhr.status === 201 ) {
-                console.log( xhr.status, 'TAB Upload Success' ); // 성공
-                //resolve( xhr.response )
-        
-            } else {
-                console.error( xhr.status, xhr.responseText ); // 실패
-            }
+             if ( xhr.status === 200 || xhr.status === 201 ) {
+                callback(null, xhr.response)
+             } else {
+                callback(xhr.responseText, null)
+             }
         };
         xhr.open('POST', 'http://localhost:8000/upload' );
         xhr.send(formData); // 폼 데이터 객체 전송
@@ -27,7 +26,7 @@ const FileShare = (function() {
         try {
 
             let fileCount = 0;
-            Array.prototype.forEach.call(this.files, function(file){
+            _each.call(this.files, function(file){
                 let name = file.name;
                 let ext = name.substring(name.lastIndexOf('.') + 1).toUpperCase();
     
@@ -45,9 +44,29 @@ const FileShare = (function() {
         }
     }
 
+    function checkPDF(files) {
+        let isPDF = false;
+        let pdfCheck = /pdf|PDF/;
+        _each.call(files, function(file) {
+            let name = file.name;
+            if (pdfCheck.test(name)) {
+                isPDF = file;
+            }
+        })
+        return isPDF;
+    }
+
+    function pdfToImage(file) {
+        PDFJS.getDocument(file).then((pdf) => {
+            console.log('!!')
+        });
+    }
+
     return {
         checkExtension,
         sendFiles,
+        checkPDF,
+        pdfToImage,
     }
 })();
 

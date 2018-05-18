@@ -47,8 +47,6 @@ const AppSocket = (function() {
             case 'ExitRoom':
                 Common.eventGenerator('exitRoom', data);
                 break;
-            
-
         }
     }
 

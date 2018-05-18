@@ -59,7 +59,7 @@ app.post('/upload', function (req, res, next) {
     form.parse(req, function (err, fields, files) {
         console.log('################## fields', fields)
         console.log('################## files',files)
-        res.status(200).send()
+        res.status(200).send(files)
     })
 
 });

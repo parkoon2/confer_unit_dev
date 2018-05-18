@@ -17,6 +17,8 @@
             <input type='submit' value='upload'>
     </form>
 
+    <div id="holder"></div>
+
     <!-- Copying socket.io.js to a public folder (something as resources/js/socket.io.js) is not the proper way to do it.
 
 If Socket.io server listens properly to your HTTP server, it will automatically serve the client file 
@@ -26,7 +28,7 @@ to via http://localhost:<port>/socket.io/socket.io.js,
     <script src="../script/config/default.js"></script>
     <script src="../script/socket/socketInfo.js"></script>
     <script src="../script/socket/socketEvent.js"></script>
-    
+    <script src="../script/lib/pdf.js"></script>
     <script src="../script/controllers/fileshareController.js"></script>
     <script src="../script/services/fileshareService.js"></script>
     <script>
