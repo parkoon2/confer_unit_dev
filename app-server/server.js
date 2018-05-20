@@ -5,6 +5,7 @@ const path = require('path');
 const app = express();
 const config = require('./js/config/default');
 var multiparty = require('multiparty');
+const multer = require('multer');
 const port = process.env.PORT || config.port;
 const router = express.Router();
 
@@ -24,7 +25,8 @@ app.set('view engine', 'ejs');
 
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded());
-app.use(express.static('public'));
+app.use('/', express.static(path.join(__dirname, '/public')));
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 // apply the routes to our application
 //app.use('/', router)
@@ -34,35 +36,52 @@ app.use('/manage', manage);
 app.use('/webrtc', webrtc);
 
 
-app.post('/upload', function (req, res, next) {
-    var form = new multiparty.Form({
-        autoFiles: false,
-        uploadDir: __dirname + '\\tmp\\',
-        maxFilesSize: 1024 * 1024 * 200  // 파일 용량 제한
-    });
 
-    // file upload exeption
-    form.on('error', function (err) {
-        console.log('[upload_test.js]' + err);
-        throw err;
-    });
+var upload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            // 폴더 없으면 폴더 만들어야함.
+            cb(null, path.join(__dirname, 'uploads/'));
+        },
+        filename: function (req, file, cb) {
+            console.log('file', file)
+            let extname = path.extname(file.originalname)
+            if (file.originalname === 'blob') {
+                extname = 'png'
+            }
+            cb(null, new Date().valueOf() + extname);
+        }
+    }),
+})
+// array('filed 명', 받을 파일 개수)
+var type = upload.array('parkoon', 10);
 
-    // get uploader field key&value
-    form.on('field', function (name, value) {
-        console.log('[upload_test.js] form name: ' + name + ', value: ' + value);
-    });
-
-    form.on('progress', function (byteRead, byteExpected) {
-        console.log('[upload_test.js] Reading total  ' + byteRead + '/' + byteExpected);
-    });
-
-    form.parse(req, function (err, fields, files) {
-        console.log('################## fields', fields)
-        console.log('################## files',files)
-        res.status(200).send(files)
+app.post('/upload', type, function (req, res, next) {
+    console.log('!')
+    //let files = JSON.stringify(req.files);
+    let files = req.files;
+    let result = [];
+    console.log('files', files)
+    files.forEach(function(file) {
+        let mimetype = file.mimetype;
+        let filename = file.filename;
+        // 근데 경로가 너무 쉬운거 아닌가...?
+        // 스트링으로 접근하기 힘든... 폴더를 하나 만들어야하나..?
+        let path = `http://localhost:8000/uploads/${filename}`;
+        result.push({
+            mimetype,
+            filename,
+            path
+        });
     })
-
+    //console.log(req.body); //form fields
+    //console.log(req.files); //form files
+   res.status(200).send(result);
 });
+
+function pdfToImg(path) {
+    console.log(path)
+}
 
 // router.use('/', function(req, res, next) {
 //     console.log(req.method, req.url)

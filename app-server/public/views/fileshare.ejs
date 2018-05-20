@@ -9,16 +9,15 @@
 </head>
 <body>
     <form action='/upload' method='post' enctype='multipart/form-data'>
-        name
+       
         <input type='text' name='username'>
         <p>
-            file :
-            <input type='file' id='fileInput' name='fileInput' multiple>
+            
+            <input type='file' id='fileInput' name='parkoon' multiple>
             <input type='submit' value='upload'>
     </form>
 
-    <div id="holder"></div>
-
+    <div id="imageArea"></div>
     <!-- Copying socket.io.js to a public folder (something as resources/js/socket.io.js) is not the proper way to do it.
 
 If Socket.io server listens properly to your HTTP server, it will automatically serve the client file 

@@ -2,24 +2,51 @@ const FileShare = (function() {
 
     let _each = Array.prototype.forEach;
 
-    function sendFiles(files, callback) {
-        let formData = new FormData();
-        for (let i = 0 ; i < files.length ; i ++) {
-            let file = files[i];
-            let ext = file.name.substring(file.name.lastIndexOf('.') + 1).toUpperCase();
-            formData.append(ext, file);
+    function sendFiles(data, callback) {
+        try {
+            let {files, url, filedname } = data;
+            
+            let formData = new FormData();
+            if (hasLengthProperty(files)) {
+                for (let i = 0 ; i < files.length ; i ++) {
+                    formData.append(filedname, files[i]);
+                }
+            } else {
+                formData.append(filedname, files);
+            }
+            
+            sendToServer(formData, url, function(err, result) {
+                if (err) { throw err; }
+                callback(null, result);
+            });
+      
+        } catch(err) {
+            callback(err, null);
         }
-        let xhr = new XMLHttpRequest(); 
+    }
+
+    function sendToServer(data, url, callback) {
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', url);
+        xhr.send(data); 
         xhr.onload = function() {
              if ( xhr.status === 200 || xhr.status === 201 ) {
-                callback(null, xhr.response)
+                callback(null, JSON.parse(xhr.response));
              } else {
                 callback(xhr.responseText, null)
              }
-        };
-        xhr.open('POST', 'http://localhost:8000/upload' );
-        xhr.send(formData); // 폼 데이터 객체 전송
-        
+        }
+    }
+
+    function hasLengthProperty(obj) {
+        try {
+            if ('length' in obj) {
+                return true;
+            }
+            throw 'no length prop';
+        } catch (e) {
+            return false
+        }
     }
 
     function checkExtension(callback) {
@@ -45,28 +72,65 @@ const FileShare = (function() {
     }
 
     function checkPDF(files) {
-        let isPDF = false;
+        let result = false;
         let pdfCheck = /pdf|PDF/;
         _each.call(files, function(file) {
-            let name = file.name;
-            if (pdfCheck.test(name)) {
-                isPDF = file;
+            let mimetype = file.mimetype;
+            let path = file.path
+            if (pdfCheck.test(mimetype)) {
+                result = path;
             }
         })
-        return isPDF;
+        return result;
     }
 
-    function pdfToImage(file) {
-        PDFJS.getDocument(file).then((pdf) => {
-            console.log('!!')
-        });
+    function addList(desti, source) {
+        console.log(desti, source)
     }
+
+    function pdfToCanvasBlob(file, callback) {
+        try {
+            let scale = 1;
+            PDFJS.getDocument(file).then(function(pdf) {
+                let pages = pdf.numPages;
+                let index = 1;
+                for ( ; index <= pages; index ++) {
+                    pdf.getPage(index).then(function(page) {
+    
+                        let canvas = document.createElement('canvas');
+                        let canvasContext = canvas.getContext('2d');
+                        let viewport = page.getViewport(scale);
+    
+                        document.getElementById('holder').appendChild(canvas);
+    
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+    
+                        let renderTask = page.render({canvasContext, viewport});
+                        
+                        renderTask.promise.then(function() {
+                            canvas.toBlob(function(blob) {
+                                callback(null, blob)
+                            }, 'image/jpeg');
+                        });
+                    });
+                }
+            });
+
+        } catch (err) {
+            callback(err, null)
+        }
+    }
+
+
+
 
     return {
         checkExtension,
         sendFiles,
         checkPDF,
-        pdfToImage,
+        pdfToCanvasBlob,
+        addList,
     }
 })();
 
