@@ -44,10 +44,9 @@ var upload = multer({
             cb(null, path.join(__dirname, 'uploads/'));
         },
         filename: function (req, file, cb) {
-            console.log('file', file)
             let extname = path.extname(file.originalname)
             if (file.originalname === 'blob') {
-                extname = 'png'
+                extname = '.png';
             }
             cb(null, new Date().valueOf() + extname);
         }

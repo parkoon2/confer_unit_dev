@@ -84,8 +84,19 @@ const FileShare = (function() {
         return result;
     }
 
+    // 공통으로 뺄 수 있으면 빼자
+    // 친구에서도 쓰고 있다.
     function addList(desti, source) {
-        console.log(desti, source)
+        let domString = `<a href="#" data-link="${source}"><img width="300", height="300" src="${source}"></img></a>`;
+        desti.appendChild(cookdom(domString));
+        
+    }
+
+    // 공통으로 뺄 수 있으면 빼자
+    function cookdom(str) {
+        let el = document.createElement('div');
+        el.innerHTML = str;
+        return el.firstChild;
     }
 
     function pdfToCanvasBlob(file, callback) {
@@ -100,8 +111,6 @@ const FileShare = (function() {
                         let canvas = document.createElement('canvas');
                         let canvasContext = canvas.getContext('2d');
                         let viewport = page.getViewport(scale);
-    
-                        document.getElementById('holder').appendChild(canvas);
     
                         canvas.height = viewport.height;
                         canvas.width = viewport.width;
@@ -122,7 +131,26 @@ const FileShare = (function() {
         }
     }
 
+    function addEventToTarget(target) {
+        let links = target.querySelectorAll('a');
+        links.forEach(function(link) {
+            if (hasEvent(link)) {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    alert(link.dataset.link)
+                })
+            }
+        })
+    }
 
+    function hasEvent(link) {
+        let eventDataset = link.dataset.event;
+        if (!eventDataset) {
+            link.dataset.event = 'on';
+            return true;
+        }
+        return false;
+    }
 
 
     return {
@@ -131,6 +159,7 @@ const FileShare = (function() {
         checkPDF,
         pdfToCanvasBlob,
         addList,
+        addEventToTarget,
     }
 })();
 

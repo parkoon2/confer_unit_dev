@@ -9,14 +9,10 @@
 </head>
 <body>
     <form action='/upload' method='post' enctype='multipart/form-data'>
-       
-        <input type='text' name='username'>
-        <p>
-            
-            <input type='file' id='fileInput' name='parkoon' multiple>
-            <input type='submit' value='upload'>
+        <input type='file' id='fileInput' name='parkoon' multiple>
     </form>
-
+    
+    <div id="holder"></div>
     <div id="imageArea"></div>
     <!-- Copying socket.io.js to a public folder (something as resources/js/socket.io.js) is not the proper way to do it.
 
