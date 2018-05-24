@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Crazy Images</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="content">
+        <header>
+            <div id="closeBtn" class="option">&#x2716;</div>
+            <div id="fullscreenBtn" class="option">&#x1f5d6;</div>
+            <div id="minimizeBtn" class="option">&#x1f5d5;</div>
+        </header>
+        
+        <div>
+            <h4>1. .rgb 파일을 읽어 canvas에 그림으로 변환</h4>
+            <button id="rgbStartBtn">START</button>
+            <button id="rgbEndBtn">END</button>
+        </div>
+        <br>
+        <div>
+            <h4>2. ffmpeg를 이용해 descktop을 캡처 후 video에 스트림 추가</h4>
+            
+            <button id="ffmpegCaptureStartBtn">START</button>
+            <button id="ffmpegCaptureEndBtn">END</button>
+        </div>
+        <br>
+
+        <div>
+            <h4>3. 내장 모듈인 desktop capture API를 이용해 화면 캡처 후 video에 스트림 추가</h4>
+            <button id="deskCaptureBtn">START</button>
+            <button id="deskCaptureEndBtn">END</button>
+        </div>
+        <br>
+
+        <!-- <div >
+            <h4> RECORDING </h4>
+            <button id="recStartBtn">START</button>
+            <button id="recEndBtn">END</button>
+        </div> -->
+
+
+    </div>
+    <script>
+        require('../js/controller/index.js')
+        require('../js/controller/record.js')
+        require('../js/controller/desktop-capture.js')
+        require('../js/controller/rgb-to-img.js')
+        require('../js/controller/ffmpeg-capture.js')
+    </script>
+</body>
+</html>
